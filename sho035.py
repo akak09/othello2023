@@ -159,6 +159,85 @@ class OchibiAI(OthelloAI):
         valid_moves = get_valid_moves(board, piece)
         return valid_moves[0]
 
+# 自作AI
+class NineAI(object):
+    def __init__(self, face, name):
+        self.face = face
+        self.name = name
+
+    def __repr__(self):
+        return f"{self.face}{self.name}"
+
+    def move(self, board: np.array, piece: int) -> tuple[int, int]:
+        valid_moves = get_valid_moves(board, piece)
+        if valid_moves:
+            # 有効な手がある場合、最善の手を選択
+            _, best_move = self.maximize(board, piece, depth=3)
+            return best_move
+        else:
+            # 置ける場所がない場合は、ランダムに手を選択
+            return random.choice(all_positions(board))
+
+    def maximize(self, board, piece, depth):
+        # ミニマックス法で最大化ノードを評価
+        if depth == 0 or len(get_valid_moves(board, piece)) == 0:
+            return self.evaluate_board(board, piece), None
+
+        max_eval = float('-inf')
+        best_move = None
+
+        valid_moves = get_valid_moves(board, piece)
+        for move in valid_moves:
+            new_board = self.make_move(board, move, piece)
+            eval, _ = self.minimize(new_board, -piece, depth - 1)
+
+            if eval > max_eval:
+                max_eval = eval
+                best_move = move
+
+        return max_eval, best_move
+
+    def minimize(self, board, piece, depth):
+        # ミニマックス法で最小化ノードを評価
+        if depth == 0 or len(get_valid_moves(board, piece)) == 0:
+            return self.evaluate_board(board, piece), None
+
+        min_eval = float('inf')
+        best_move = None
+
+        valid_moves = get_valid_moves(board, piece)
+        for move in valid_moves:
+            new_board = self.make_move(board, move, piece)
+            eval, _ = self.maximize(new_board, -piece, depth - 1)
+
+            if eval < min_eval:
+                min_eval = eval
+                best_move = move
+
+        return min_eval, best_move
+
+    def evaluate_board(self, board, piece):
+        # ボードの評価関数
+        return np.sum(board == piece) - np.sum(board == -piece)
+
+    def make_move(self, board, move, piece):
+        # 手を実行した後のボードを取得
+        new_board = board.copy()
+        row, col = move
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)]
+
+        for dr, dc in directions:
+            r, c = row + dr, col + dc
+            flip_stones = []
+            while 0 <= r < len(board) and 0 <= c < len(board[row]) and board[r, c] == -piece:
+                flip_stones.append((r, c))
+                r, c = r + dr, c + dc
+            if 0 <= r < len(board) and 0 <= c < len(board[row]) and board[r, c] == piece:
+                for flip_row, flip_col in flip_stones:
+                    new_board[flip_row, flip_col] = piece
+
+        new_board[row, col] = piece
+        return new_board
 
 def board_play(player: OthelloAI, board, piece: int):
     display_board(board, sleep=0)
