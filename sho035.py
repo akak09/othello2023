@@ -150,20 +150,11 @@ class OthelloAI(object):
         else:
             return 'がーん'
 
-class OchibiAI(OthelloAI):
-    def __init__(self, face, name):
-        self.face = face
-        self.name = name
-
-    def move(self, board: np.array, piece: int)->tuple[int, int]:
-        valid_moves = get_valid_moves(board, piece)
-        return valid_moves[0]
-
 # 自作AI
-class NineAI(object):
+class NineAI(OthelloAI):
     def __init__(self, face, name):
-        self.face = face
-        self.name = name
+        self.face = '⭐'
+        self.name = 'ほし'
 
     def __repr__(self):
         return f"{self.face}{self.name}"
@@ -238,6 +229,21 @@ class NineAI(object):
 
         new_board[row, col] = piece
         return new_board
+
+    def say(self, board: np.array, piece: int)->str:
+        if count_board(board, piece) >= count_board(board, -piece):
+            return 'やったー'
+        else:
+            return 'がーん'
+
+class OchibiAI(OthelloAI):
+    def __init__(self, face, name):
+        self.face = face
+        self.name = name
+
+    def move(self, board: np.array, piece: int)->tuple[int, int]:
+        valid_moves = get_valid_moves(board, piece)
+        return valid_moves[0]
 
 def board_play(player: OthelloAI, board, piece: int):
     display_board(board, sleep=0)
