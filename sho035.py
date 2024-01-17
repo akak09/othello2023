@@ -29,9 +29,9 @@ BG_EMPTY = "\x1b[42m"
 BG_RESET = "\x1b[0m"
 
 stone_codes = [
-    f'{BG_EMPTY}'黒'{BG_RESET}',
-    f'{BG_EMPTY}'・'{BG_RESET}',
-    f'{BG_EMPTY}'白'{BG_RESET}',
+    f'{BG_EMPTY}⚫️{BG_RESET}',
+    f'{BG_EMPTY}🟩{BG_RESET}',
+    f'{BG_EMPTY}⚪️{BG_RESET}',
 ]
 
 def stone(piece):
